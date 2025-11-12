@@ -1,9 +1,97 @@
-<section
-  id="experience"
-  class="py-12 border-t border-[#ffffff10] text-[var(--white)]">
+---
+interface Experience {
+  role: string;
+  company: string;
+  companyLink?: string;
+  period: string;
+  location?: string;
+  description: string | string[];
+  tags?: string; // comma-separated
+}
 
+const experiences: Experience[] = [
+  {
+    role: "Systems Analyst",
+    company: "Government of the City of Buenos Aires",
+    companyLink: "https://buenosaires.gob.ar/justicia/agencia-gubernamental-de-control",
+    period: "Dicember 2024 — October 2025",
+    location: "Argentina, Buenos Aires",
+    description: [
+      "Developed and maintained backend solutions using C# and .NET to resolve critical bugs and implement new system features.", 
+      "Automated system synchronization tests between the SGI and SISCOR platforms using C#/.NET, significantly reducing manual validation time.", 
+      "Collaborated on architecture design and code reviews for new implementations, ensuring quality and adherence to technical standards.",
+      "Actively participated in the Agile (Scrum) lifecycle, collaborating with Project Leads and infrastructure teams to define technical requirements and ensure successful delivery."
+    ],
+    tags: "C-Sharp, .NET, Postman, Automation, Project Management, Testing",
+  },
+  {
+    role: "Scrum Master (Intern)",
+    company: "Sistemas Activos SRL",
+    companyLink: "https://www.sistemasactivos.com/",
+    period: "September 2022 — October 2022",
+    location: "Remote",
+    // converted to array for explicit bullets
+    description: [
+      "Facilitated Agile ceremonies (dailies, sprint planning, retrospectives) and removed impediments.",
+      "Led initial project scope definition for a library management system and created the initial Product Backlog.",
+      "Collaborated with the team to define and prioritize tasks for the first sprints.",
+      "Coordinated selection of management and development tools (Trello, VS Code) to optimize workflow.",
+    ],
+    tags: "Scrum Master, Agile, Problem Solving, Project Management, Requirements Definition",
+  },
+];
+---
+
+<section id="experience" class="py-12 border-t border-[#ffffff10] text-[var(--white)]">
   <div class="max-w-5xl mx-auto">
     <h2 class="text-lg text-[var(--sec)] mb-2 shiny-sec">Learn about my</h2>
     <h3 class="text-4xl md:text-5xl font-medium mb-8">Experience</h3>
-    
+
+    <div class="space-y-6">
+      {experiences.map((exp) => (
+        <div class="rounded-2xl p-6 bg-[#0b0b0b] border border-[#ffffff10] shadow-sm">
+          <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+            <div>
+              <h4 class="text-2xl font-semibold">
+                {exp.role}
+                {exp.companyLink ? (
+                  <a href={exp.companyLink} target="_blank" rel="noopener noreferrer" class="ml-2 text-[var(--white-icon)] text-sm hover:underline">
+                    {exp.company}
+                  </a>
+                ) : (
+                  <span class="ml-2 text-[var(--white-icon)] text-sm">{exp.company}</span>
+                )}
+              </h4>
+              <div class="text-sm text-[var(--white-icon)] mt-1">
+                {exp.period}{exp.location ? ` · ${exp.location}` : ''}
+              </div>
+            </div>
+            <div class="ml-auto flex-shrink-0">
+              {/* reserved for badges or icons if needed */}
+            </div>
+          </div>
+
+          {Array.isArray(exp.description) ? (
+            <ul class="mt-4 list-disc pl-6 space-y-2 text-[var(--white-icon)] marker:text-[var(--white-icon)]">
+              {exp.description.map((line) => (
+                <li>{line}</li>
+              ))}
+            </ul>
+          ) : (
+            <p class="mt-4 text-[var(--white-icon)]">{exp.description}</p>
+          )}
+
+          {exp.tags && (
+            <div class="mt-4 flex flex-wrap gap-2">
+              {exp.tags.split(",").map((t) => (
+                <span class="inline-flex items-center text-sm text-[var(--white-icon)] bg-[#1414149c] px-3 py-1 rounded-full border border-[#221A33]">
+                  {t.trim()}
+                </span>
+              ))}
+            </div>
+          )}
+        </div>
+      ))}
+    </div>
+  </div>
 </section>
