@@ -1,4 +1,107 @@
+---
+interface Education {
+  degree: string;
+  institution: string;
+  institutionLink?: string;
+  period: string;
+  location?: string;
+  description: string | string[];
+  tags?: string; // comma-separated
+}
+
+const educations: Education[] = [
+  {
+    degree: "Systems Engineering",
+    institution: "Universidad Abierta Interamericana (UAI)",
+    institutionLink: "https://uai.edu.ar/",
+    period: "2020 — On Course",
+    location: "Argentina, Buenos Aires",
+    description: [
+      "Core subjects: Algorithms, Databases, Distributed Systems and Software Architecture.",
+      "Final project: Design and implementation of a backend service using C# and .NET.",
+      "Activities: participated in university labs and collaborative dev teams."
+    ],
+    tags: "Systems Engineering, C#, .NET, Databases",
+  },
+  {
+    degree: "Systems Analyst (Diploma)",
+    institution: "Universidad Abierta Interamericana (UAI)",
+    institutionLink: "https://uai.edu.ar/",
+    period: "2020 - 2025",
+    location: "Argentina, Buenos Aires",
+    description: [
+      "Intermediate degree in Systems Engineering",
+      "Learned systems analysis methodologies and requirements elicitation.",
+      "Applied Agile practices and basic project management techniques."
+    ],
+    tags: "Systems Analysis, Agile, Requirements",
+  },
+  {
+    degree: "Backend Programming",
+    institution: "Coderhouse",
+    institutionLink: "https://www.coderhouse.com/ar/",
+    period: "2020 - 2025",
+    location: "Argentina, Buenos Aires",
+    description: [
+      "Intermediate degree in Systems Engineering",
+      "Learned systems analysis methodologies and requirements elicitation.",
+      "Applied Agile practices and basic project management techniques."
+    ],
+    tags: "JavaScript, NPM, Express, NodeJs, MongoDB",
+  },
+];
+---
+
 <section id="education" class="py-12 border-t border-[#ffffff10] text-[var(--white)]">
   <div class="max-w-5xl mx-auto">
-    <h2 class="text-lg text-[var(--sec)] mb-2 shiny-sec">My Studies</h2>
+    <h2 class="text-lg text-[var(--sec)] mb-2 shiny-sec">My background</h2>
     <h3 class="text-4xl md:text-5xl font-medium mb-8">Education</h3>
+
+    <div class="space-y-6">
+      {educations.map((edu) => (
+        <div class="rounded-2xl p-6 bg-[#0b0b0b] border border-[#ffffff10] shadow-sm">
+          <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+            <div>
+              <h4 class="text-2xl font-semibold">
+                {edu.degree}
+                {edu.institutionLink ? (
+                  <a href={edu.institutionLink} target="_blank" rel="noopener noreferrer" class="ml-2 text-[var(--white-icon)] text-sm hover:underline">
+                    {edu.institution}
+                  </a>
+                ) : (
+                  <span class="ml-2 text-[var(--white-icon)] text-sm">{edu.institution}</span>
+                )}
+              </h4>
+              <div class="text-sm text-[var(--white-icon)] mt-1">
+                {edu.period}{edu.location ? ` · ${edu.location}` : ''}
+              </div>
+            </div>
+            <div class="ml-auto flex-shrink-0">
+              {/* reserved for badges or icons if needed */}
+            </div>
+          </div>
+
+          {Array.isArray(edu.description) ? (
+            <ul class="mt-4 list-disc pl-6 space-y-2 text-[var(--white-icon)] marker:text-[var(--white-icon)]">
+              {edu.description.map((line) => (
+                <li>{line}</li>
+              ))}
+            </ul>
+          ) : (
+            <p class="mt-4 text-[var(--white-icon)]">{edu.description}</p>
+          )}
+
+          {edu.tags && (
+            <div class="mt-4 flex flex-wrap gap-2">
+              {edu.tags.split(",").map((t) => (
+                <span class="inline-flex items-center text-sm text-[var(--white-icon)] bg-[#1414149c] px-3 py-1 rounded-full border border-[#221A33]">
+                  {t.trim()}
+                </span>
+              ))}
+            </div>
+          )}
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
