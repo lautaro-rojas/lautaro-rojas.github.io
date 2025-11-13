@@ -1,10 +1,10 @@
 ---
 import { Image } from "astro:assets";
-import svgl from "../../public/svgl.png";
-import stockin from "../../public/stockin.png";
-import moviesfordevs from "../../public/moviesfordevs.png";
-import velez from "../../public/velez.png";
+
 import sidetask from "../../public/sidetask.png";
+import coderhouse from "../../public/coderhouse.png";
+import cinepromanager from "../../public/cinepromanager.png";
+import apirest from "../../public/apirest.png";
 
 interface Project {
   title: string;
@@ -17,13 +17,37 @@ interface Project {
 
 const projects: Project[] = [
   {
-    title: "SideTask - All in One TODO extension",
+    title: "CineProManager2",
+    image: cinepromanager as ImageMetadata,
+    link: "https://github.com/lautaro-rojas/CineProManager2",
+    preview: "https://github.com/lautaro-rojas/CineProManager2",
+    status: "Deployed", 
+    tags: "C#, .NET Framework, SQL Server, WindowsForms, CRUD",
+  },
+  {
+    title: "HybridApiREST",
+    image: apirest as ImageMetadata,
+    link: "https://github.com/lautaro-rojas/HybridApiREST",
+    preview: "https://github.com/lautaro-rojas/HybridApiREST",
+    status: "On Development", 
+    tags: "C#, ASP.NET Core, CRUD, SQL Server, HTTP, Swagger",
+  },
+  {
+    title: "SideTask - VSC extension",
     image: sidetask as ImageMetadata,
     link: "https://github.com/lautaro-rojas/SideTask",
     preview: "https://marketplace.visualstudio.com/items?itemName=LautaroRojas.sidetask",
     status: "Deployed - On Development", 
     tags: "TypeScript, NodeJs, GitHub Actions, CI/CD",
-  }, //TODO: Poner mas proyectos que fundamenten lo de C#...
+  },
+  {
+    title: "Coderhouse project",
+    image: coderhouse as ImageMetadata,
+    link: "https://github.com/lautaro-rojas/ReposCoderhouse",
+    preview: "https://github.com/lautaro-rojas/ReposCoderhouse",
+    status: "On Development", 
+    tags: "JavaScript, NPM, Express, NodeJs, MongoDB, HTTP",
+  },
 ];
 ---
 
