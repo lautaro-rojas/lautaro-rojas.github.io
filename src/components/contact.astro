@@ -14,14 +14,19 @@
           <span class="text-[var(--white)]">Argentina, Buenos Aires</span>
         </div>
       </div>
-      <!-- BUG: El envio de mensajes no anda -->
       <div>
         <form
           id="contact-form"
-          action="https://formspree.io/f/mnnjznkj"
+          action="https://formspree.io/f/mjkqwkpd"
           method="POST"
           class="flex flex-col gap-4"
         >
+          <!-- honeypot anti-spam (invisible) -->
+          <input type="text" name="_gotcha" tabindex="-1" autocomplete="off" style="display:none" />
+          <!-- optional: suggested subject -->
+          <input type="hidden" name="_subject" value="New message from portfolio" />
+          <!-- disable Formspree's built-in captcha (optional) -->
+          <!-- <input type="hidden" name="_captcha" value="false" /> -->
           <input
             type="text"
             name="from_name"
@@ -31,7 +36,7 @@
           />
           <input
             type="email"
-            name="reply_to"
+            name="email"
             placeholder="Email"
             required
             class="px-4 py-2 bg-[#1414149c] text-[var(--white)] border border-[var(--white-icon-tr)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--sec)]"
@@ -43,18 +48,23 @@
             required
             class="px-4 py-2 bg-[#1414149c] text-[var(--white)] border border-[var(--white-icon-tr)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--sec)] resize-none"
           ></textarea>
-          <button
-            type="submit"
-            class="px-4 py-2 bg-[var(--white-icon-tr)] text-[var(--white)] rounded-lg opacity-60 transition-opacity border border-[var(--white-icon-tr)] hover:opacity-100 hover:bg-[var(--white-icon-tr)]"
-          >
-            Submit
-          </button>
+          
+          <button id="contact-submit" type="submit" class="px-4 py-2 bg-[var(--white-icon-tr)] text-[var(--white)] rounded-lg opacity-60 transition-opacity border border-[var(--white-icon-tr)] hover:opacity-100 hover:bg-[var(--white-icon-tr)]">Submit</button>
         </form>
         <div
           id="form-message"
           class="hidden justify-center items-center mt-4 text-[var(--white)] text-lg"
         >
           ✅ Thank you for your message!
+        </div>
+        <!-- Fallback UI shown when fetch fails so user can capture console/network -->
+        <div id="contact-fallback" class="hidden mt-4 p-4 bg-[#111111] rounded-lg text-[var(--white)]">
+          <p class="mb-2">There was a problem sending the message via JavaScript.</p>
+          <p class="mb-4 text-sm text-[var(--white-icon)]">You can proceed to send the form (will reload the page), or cancel to try again after checking DevTools.</p>
+          <div class="flex gap-2">
+            <button id="proceed-submit" class="px-3 py-1 bg-[var(--sec)] rounded">Proceed and submit</button>
+            <button id="cancel-submit" class="px-3 py-1 border border-[var(--white-icon-tr)] rounded">Cancel</button>
+          </div>
         </div>
       </div>
     </div>
@@ -64,29 +74,88 @@
 <script type="module" is:inline>
   const form = document.getElementById("contact-form");
   const formMessage = document.getElementById("form-message");
+  const submitBtn = document.getElementById("contact-submit");
 
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const formData = new FormData(form);
+  if (form) {
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
 
-    try {
-      const response = await fetch(form.action, {
-        method: "POST",
-        body: formData,
-        headers: { Accept: "application/json" },
-      });
-      if (response.ok) {
-        form.reset();
-        form.style.display = "none";
-        formMessage.classList.remove("hidden");
-      } else {
-        const data = await response.json();
-        console.error("Error response:", data);
-        alert("There was a problem sending your message.");
+      // honeypot check (optional client-side)
+      const gotcha = form.querySelector('input[name="_gotcha"]');
+      if (gotcha && gotcha.value) {
+        // likely bot; silently ignore or optionally show an error
+        return;
       }
-    } catch (error) {
-      console.error("Error:", error);
-      alert("There was a problem sending your message.");
-    }
-  });
+
+      const formData = new FormData(form);
+      submitBtn.disabled = true;
+      submitBtn.classList.add("opacity-50", "cursor-not-allowed");
+
+      try {
+        // Try POST without custom headers to reduce chance of CORS preflight issues
+        const res = await fetch(form.action, {
+          method: "POST",
+          body: formData,
+          headers: { 
+          'Accept': 'application/json'
+          }
+        });
+
+        if (res.ok) {
+          // success
+          form.reset();
+          form.style.display = "none";
+          if (formMessage) {
+            formMessage.textContent = "✅ Thank you for your message!";
+            formMessage.classList.remove("hidden");
+          }
+        } else {
+          // try to parse JSON error for debugging
+          let err = {};
+          try { err = await res.json(); } catch (e) {}
+          console.error("Formspree error:", res.status, err);
+          alert("There was a problem sending your message. Try again later.");
+        }
+      } catch (error) {
+        console.error("Network or CORS error:", error);
+        // Instead of submitting immediately, show a small confirmation UI
+        // so the user has time to open DevTools and capture console/network logs.
+        const fallback = document.getElementById('contact-fallback');
+        const proceedBtn = document.getElementById('proceed-submit');
+        const cancelBtn = document.getElementById('cancel-submit');
+        if (fallback) {
+          fallback.classList.remove('hidden');
+        }
+
+        if (proceedBtn) {
+          proceedBtn.addEventListener('click', () => {
+            // submit normally (will navigate away)
+            try {
+              form.submit();
+            } catch (submitErr) {
+              console.error('Fallback submit failed', submitErr);
+              alert('Fallback submit failed. See console for details.');
+            }
+          });
+        }
+
+        if (cancelBtn) {
+          cancelBtn.addEventListener('click', () => {
+            if (fallback) fallback.classList.add('hidden');
+            submitBtn.disabled = false;
+            submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+          });
+        }
+        // Informative alert as well
+        alert('Network error. Opening a confirmation so you can capture logs in DevTools before submitting.');
+      } finally {
+        // keep submit button disabled while fallback UI is visible; if not visible, re-enable
+        const fallbackEl = document.getElementById('contact-fallback');
+        if (!fallbackEl || fallbackEl.classList.contains('hidden')) {
+          submitBtn.disabled = false;
+          submitBtn.classList.remove("opacity-50", "cursor-not-allowed");
+        }
+      }
+    });
+  }
 </script>
